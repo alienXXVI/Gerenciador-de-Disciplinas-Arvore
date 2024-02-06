@@ -1,0 +1,2 @@
+proximo passo: fazer o resto das funções de inserir para as outras estruturas
+    - copiar e colar
