@@ -1,2 +1,23 @@
 proximo passo: fazer o resto das funções de inserir para as outras estruturas
     - copiar e colar
+
+
+– cadastrar curso OK
+– cadastrar disciplina OK
+– cadastrar professor OK
+– cadastrar distribuicao de disciplina
+– remover distribuicao de disciplina: remove a distribui¸c˜ao de uma disciplina dado seu o c´odigo e
+ano letivo
+– imprimir lista de cursos, ordenados por codigo OK
+– imprimir lista de disciplinas, ordenadas por codigo OK
+– imprimir lista de professores, ordenadas por codigo OK
+– imprimir lista de distribuicao de disciplina, ordenadas por ano letivo e codigo da disciplina
+– imprimir lista de posicoes de registros livres, referentes as distribuicoes de disciplinas removidas
+– imprimir a arvore binaria (somente as chaves) da distribuicao de disciplinas por nıvel. Considerando a arvore da figura anterior, a saıda seria:
+202304
+202303 202306
+202301 202305 202307
+202207 202302
+202204 202210
+202202 202206 202208 202211
+– carregar arquivo de lote: carrega arquivo texto contendo operacoes de inclusao e remocao em lote

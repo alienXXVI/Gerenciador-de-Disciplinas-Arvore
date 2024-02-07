@@ -51,16 +51,36 @@ void imprimir_associacao(Associacao* a) {
 
 
 int main() {
-    FILE *arq_disciplinas = open_arq("arq_disciplinas.txt");
-    Disciplina *d0 = criar_disciplina(2, "banco de dados2", 11, 3);
-    Disciplina *d1 = criar_disciplina(1, "banco de dados1", 10, 3);
-    Disciplina *d2 = criar_disciplina(3, "banco de dados3", 10, 4);
+    // FILE *arq_disciplinas = open_arq("arq_disciplinas.txt");
+    // Disciplina *d0 = criar_disciplina(2, "banco de dados2", 11, 3);
+    // Disciplina *d1 = criar_disciplina(1, "banco de dados1", 10, 3);
+    // Disciplina *d2 = criar_disciplina(3, "banco de dados3", 10, 4);
 
-    inserir_disciplina(arq_disciplinas, d0);
-    inserir_disciplina(arq_disciplinas, d1);
-    inserir_disciplina(arq_disciplinas, d2);
+    // inserir_disciplina(arq_disciplinas, d0);
+    // inserir_disciplina(arq_disciplinas, d1);
+    // inserir_disciplina(arq_disciplinas, d2);
 
-    print_inordem(arq_disciplinas);
+    // FILE *arq_cursos = open_arq("arq_cursos.txt");
+    // Curso *d0 = criar_curso(2, "ciencias2", 'E');
+    // Curso *d1 = criar_curso(1, "ciencias1", 'H');
+    // Curso *d2 = criar_curso(3, "ciencias3", 'B');
+
+    // inserir_curso(arq_cursos, d0);
+    // inserir_curso(arq_cursos, d1);
+    // inserir_curso(arq_cursos, d2);
+
+    // print_inordem_cursos(arq_cursos);
+
+    FILE *arq_professores = open_arq("arq_professores.txt");
+    Professor *d0 = criar_professor(103, "prof2");
+    Professor *d1 = criar_professor(101, "prof1");
+    Professor *d2 = criar_professor(100, "prof3");
+
+    inserir_professor(arq_professores, d0);
+    inserir_professor(arq_professores, d1);
+    inserir_professor(arq_professores, d2);
+
+    print_inordem_professores(arq_professores);
 
     return 0;
 }

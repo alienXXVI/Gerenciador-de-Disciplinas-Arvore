@@ -104,29 +104,38 @@ Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor)
 
 // ***************************************
 
+// Insere o nó na árvore do arquivo
+// Pré-condição: arquivo deve estar aberto para escrita
+// Pós-condição: arquivo com novo nó
 void inserir_disciplina(FILE* arq, Disciplina* d);
 
 int buscar_disciplina(FILE* arq, int codigo);
 
-void print_inordem(FILE* arq);
+void print_inordem_disciplinas(FILE* arq);
 
 
-// ********************************************
-
-// Insere o nó na árvore do arquivo
-// Pré-condição: arquivo deve estar aberto para escrita
-// Pós-condição: arquivo com novo nó
-//void inserir_disciplina(FILE *arq, Disciplina* d);
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
-void inserir_curso(FILE *arq, Curso* c);
+void inserir_curso(FILE* arq, Curso* d);
+
+int buscar_curso(FILE* arq, int codigo);
+
+void print_inordem_cursos(FILE* arq);
+
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
 void inserir_professor(FILE *arq, Professor* p);
+
+int buscar_professor(FILE* arq, int codigo);
+
+void print_inordem_professores(FILE* arq);
+
+// ********************************************
+
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
@@ -141,12 +150,12 @@ void inserir_associacao(FILE *arq_associacao, FILE *arq_disciplinas, Associacao*
 // Busca por um curso através do seu código
 // Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
 // Pós-condição: ponteiro para nó lido é retornado
-Curso* buscar_curso(FILE* arq, int codigo);
+// Curso* buscar_curso(FILE* arq, int codigo);
 
 // Busca por um professor através do seu código
 // Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
 // Pós-condição: ponteiro para nó lido é retornado
-Professor* buscar_professor(FILE* arq, int codigo);
+// Professor* buscar_professor(FILE* arq, int codigo);
 
 // Busca por uma associação através do seu código
 // Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore

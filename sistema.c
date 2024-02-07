@@ -5,6 +5,7 @@
 
 // ------------------------------- Arquivo -------------------------------
 
+
 // Verifica se o cabeçalho (a árvore) é vazia
 // Entrada: cabeçalho
 // Saída: é vazia (1) ou não é vazia (0)
@@ -71,7 +72,9 @@ FILE* open_arq(char* str){
     return arq;
 }
 
+
 // --------------------------- Sistema ---------------------------
+
 
 // Cria uma Disciplina contendo os dados fornecidos
 // Pré-condição: o código fornecido deve ser diferente para o mesmo curso
@@ -122,9 +125,11 @@ Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor)
     return a;
 }
 
-// *****************************************************
 
-void link_no(FILE* arq, int raiz, int pos, int codigo){
+// --------------------------- Disciplina ---------------------------
+
+
+void link_no_disciplina(FILE* arq, int raiz, int pos, int codigo){
     Disciplina* aux = (Disciplina*) malloc(sizeof(Disciplina));
 
     fseek(arq, sizeof(Cabecalho) + sizeof(Disciplina) * raiz, SEEK_SET);
@@ -142,7 +147,7 @@ void link_no(FILE* arq, int raiz, int pos, int codigo){
         else{ // já tem filhos à esquerda
             int pos_aux = aux->esq;
             free(aux);
-            link_no(arq, pos_aux, pos, codigo);
+            link_no_disciplina(arq, pos_aux, pos, codigo);
         }
     }
 
@@ -158,7 +163,7 @@ void link_no(FILE* arq, int raiz, int pos, int codigo){
         else{
             int pos_aux = aux->dir;
             free(aux);
-            link_no(arq, pos_aux, pos, codigo);
+            link_no_disciplina(arq, pos_aux, pos, codigo);
         }
 
     }
@@ -194,7 +199,7 @@ void inserir_disciplina(FILE* arq, Disciplina* d){
         fseek(arq, sizeof(Cabecalho) + sizeof(Disciplina) * pos, SEEK_SET);
         fwrite(d, sizeof(Disciplina), 1, arq);
         escrever_cabecalho(arq, cab);
-        link_no(arq, cab->pos_raiz, pos, d->cod);
+        link_no_disciplina(arq, cab->pos_raiz, pos, d->cod);
         free(aux);
         free(d);
         free(cab);
@@ -233,23 +238,287 @@ int buscar_disciplina(FILE* arq, int codigo){
     return pos;
 }
 
-void print_inordem_aux(FILE* arq, int raiz){
+void print_inordem_disciplinas_aux(FILE* arq, int raiz){
     if(raiz == -1)
         return;
     Disciplina* aux = (Disciplina*) malloc(sizeof(Disciplina));
 
     fseek(arq, sizeof(Cabecalho) + sizeof(Disciplina) * raiz, SEEK_SET);
     fread(aux, sizeof(Disciplina), 1, arq);
-    print_inordem_aux(arq, aux->esq);
+    print_inordem_disciplinas_aux(arq, aux->esq);
     printf("COD: %03d | NOME: %s | COD CURSO: %03d | SERIE: %03d\n\n", aux->cod, aux->nome, aux->codcurso, aux->serie);
-    print_inordem_aux(arq, aux->dir);
+    print_inordem_disciplinas_aux(arq, aux->dir);
     free(aux);
 }
 
-void print_inordem(FILE* arq){
+void print_inordem_disciplinas(FILE* arq){
     Cabecalho* cab = ler_cabecalho(arq);
-    print_inordem_aux(arq, cab->pos_raiz);
+    print_inordem_disciplinas_aux(arq, cab->pos_raiz);
 }
 
-// *********************************************************
+
+// --------------------------- Curso ---------------------------
+
+
+void link_no_curso(FILE* arq, int raiz, int pos, int codigo){
+    Curso* aux = (Curso*) malloc(sizeof(Curso));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * raiz, SEEK_SET);
+    fread(aux, sizeof(Curso), 1, arq);
+
+    // Código à esquerda do nó atual
+    if(codigo < aux->cod){
+        // O novo nó será filho esquerdo do nó atual
+        if(aux->esq == -1){
+            aux->esq = pos;
+            fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * raiz, SEEK_SET);
+            fwrite(aux, sizeof(Curso), 1, arq);
+            free(aux);
+        }
+        else{ // já tem filhos à esquerda
+            int pos_aux = aux->esq;
+            free(aux);
+            link_no_curso(arq, pos_aux, pos, codigo);
+        }
+    }
+
+    // Código à direita do nó atual
+    if(codigo > aux->cod){
+        // O novo nó será filho direito do nó atual
+        if(aux->dir == -1){
+            aux->dir = pos;
+            fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * raiz, SEEK_SET);
+            fwrite(aux, sizeof(Curso), 1, arq);
+            free(aux);
+        }
+        else{
+            int pos_aux = aux->dir;
+            free(aux);
+            link_no_curso(arq, pos_aux, pos, codigo);
+        }
+
+    }
+
+    if(codigo == aux->cod) free(aux);
+}
+
+void inserir_curso(FILE* arq, Curso* c){
+    if(buscar_curso(arq, c->cod) == -1){ // se produto já não existir
+        Cabecalho* cab = ler_cabecalho(arq);
+
+        c->dir = -1;
+        c->esq = -1;
+
+        int pos;
+        Curso* aux = (Curso*) malloc(sizeof(Curso));
+
+        // Há nós livres no arquivo
+        if(cab->pos_livre != -1){
+            fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * cab->pos_livre, SEEK_SET);
+            fread(aux, sizeof(Curso), 1, arq);
+            pos = cab->pos_livre; // guarda a posição no produto a ser inserido
+            cab->pos_livre = aux->dir; // atualiza o pos livre para o proximo
+        }
+
+        else
+            pos = (cab->pos_topo)++; // cria um novo topo
+
+        // Novo nó será a raiz da árvore
+        if(cab->pos_raiz == -1)
+            cab->pos_raiz = pos;
+
+        fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * pos, SEEK_SET);
+        fwrite(c, sizeof(Curso), 1, arq);
+        escrever_cabecalho(arq, cab);
+        link_no_curso(arq, cab->pos_raiz, pos, c->cod);
+        free(aux);
+        free(c);
+        free(cab);
+    }
+}
+
+int buscar_curso_aux(FILE* arq, int raiz, int codigo){
+    if(raiz == -1)
+        return -1;
+
+    Curso* aux = (Curso*) malloc(sizeof(Curso));
+    fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * raiz, SEEK_SET);
+    fread(aux, sizeof(Curso), 1, arq);
+
+    if(aux->cod == codigo) {
+        free(aux);
+        return raiz;
+    }
+
+    else {
+        int pos;
+        if(aux->cod > codigo)
+            pos = aux->esq;
+        else
+            pos = aux->dir;
+        free(aux);
+        return buscar_curso_aux(arq, pos, codigo);
+    }
+}
+
+int buscar_curso(FILE* arq, int codigo){
+    Cabecalho* cab = ler_cabecalho(arq);
+
+    int pos = buscar_curso_aux(arq, cab->pos_raiz, codigo);
+    free(cab);
+    return pos;
+}
+
+void print_inordem_cursos_aux(FILE* arq, int raiz){
+    if(raiz == -1)
+        return;
+    Curso* aux = (Curso*) malloc(sizeof(Curso));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Curso) * raiz, SEEK_SET);
+    fread(aux, sizeof(Curso), 1, arq);
+    print_inordem_cursos_aux(arq, aux->esq);
+    printf("COD: %03d | NOME: %s | AREA: %c\n\n", aux->cod, aux->nome, aux->area);
+    print_inordem_cursos_aux(arq, aux->dir);
+    free(aux);
+}
+
+void print_inordem_cursos(FILE* arq){
+    Cabecalho* cab = ler_cabecalho(arq);
+    print_inordem_cursos_aux(arq, cab->pos_raiz);
+}
+
+
+// --------------------------- Professor ---------------------------
+
+
+void link_no_professor(FILE* arq, int raiz, int pos, int codigo){
+    Professor* aux = (Professor*) malloc(sizeof(Professor));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * raiz, SEEK_SET);
+    fread(aux, sizeof(Professor), 1, arq);
+
+    // Código à esquerda do nó atual
+    if(codigo < aux->cod){
+        // O novo nó será filho esquerdo do nó atual
+        if(aux->esq == -1){
+            aux->esq = pos;
+            fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * raiz, SEEK_SET);
+            fwrite(aux, sizeof(Professor), 1, arq);
+            free(aux);
+        }
+        else{ // já tem filhos à esquerda
+            int pos_aux = aux->esq;
+            free(aux);
+            link_no_professor(arq, pos_aux, pos, codigo);
+        }
+    }
+
+    // Código à direita do nó atual
+    if(codigo > aux->cod){
+        // O novo nó será filho direito do nó atual
+        if(aux->dir == -1){
+            aux->dir = pos;
+            fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * raiz, SEEK_SET);
+            fwrite(aux, sizeof(Professor), 1, arq);
+            free(aux);
+        }
+        else{
+            int pos_aux = aux->dir;
+            free(aux);
+            link_no_professor(arq, pos_aux, pos, codigo);
+        }
+
+    }
+
+    if(codigo == aux->cod) free(aux);
+}
+
+void inserir_professor(FILE* arq, Professor* p){
+    if(buscar_professor(arq, p->cod) == -1){ // se produto já não existir
+        Cabecalho* cab = ler_cabecalho(arq);
+
+        p->dir = -1;
+        p->esq = -1;
+
+        int pos;
+        Professor* aux = (Professor*) malloc(sizeof(Professor));
+
+        // Há nós livres no arquivo
+        if(cab->pos_livre != -1){
+            fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * cab->pos_livre, SEEK_SET);
+            fread(aux, sizeof(Professor), 1, arq);
+            pos = cab->pos_livre; // guarda a posição no produto a ser inserido
+            cab->pos_livre = aux->dir; // atualiza o pos livre para o proximo
+        }
+
+        else
+            pos = (cab->pos_topo)++; // cria um novo topo
+
+        // Novo nó será a raiz da árvore
+        if(cab->pos_raiz == -1)
+            cab->pos_raiz = pos;
+
+        fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * pos, SEEK_SET);
+        fwrite(p, sizeof(Professor), 1, arq);
+        escrever_cabecalho(arq, cab);
+        link_no_professor(arq, cab->pos_raiz, pos, p->cod);
+        free(aux);
+        free(p);
+        free(cab);
+    }
+}
+
+int buscar_professor_aux(FILE* arq, int raiz, int codigo){
+    if(raiz == -1)
+        return -1;
+
+    Professor* aux = (Professor*) malloc(sizeof(Professor));
+    fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * raiz, SEEK_SET);
+    fread(aux, sizeof(Professor), 1, arq);
+
+    if(aux->cod == codigo) {
+        free(aux);
+        return raiz;
+    }
+
+    else {
+        int pos;
+        if(aux->cod > codigo)
+            pos = aux->esq;
+        else
+            pos = aux->dir;
+        free(aux);
+        return buscar_professor_aux(arq, pos, codigo);
+    }
+}
+
+int buscar_professor(FILE* arq, int codigo){
+    Cabecalho* cab = ler_cabecalho(arq);
+
+    int pos = buscar_professor_aux(arq, cab->pos_raiz, codigo);
+    free(cab);
+    return pos;
+}
+
+void print_inordem_professores_aux(FILE* arq, int raiz){
+    if(raiz == -1)
+        return;
+    Professor* aux = (Professor*) malloc(sizeof(Professor));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Professor) * raiz, SEEK_SET);
+    fread(aux, sizeof(Professor), 1, arq);
+    print_inordem_professores_aux(arq, aux->esq);
+    printf("COD: %03d | NOME: %s\n\n", aux->cod, aux->nome);
+    print_inordem_professores_aux(arq, aux->dir);
+    free(aux);
+}
+
+void print_inordem_professores(FILE* arq){
+    Cabecalho* cab = ler_cabecalho(arq);
+    print_inordem_professores_aux(arq, cab->pos_raiz);
+}
+
+
+// --------------------------- Associação ---------------------------
+
 
