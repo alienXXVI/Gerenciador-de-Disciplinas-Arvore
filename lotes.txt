@@ -1,0 +1,16 @@
+C;5;Administracao;H
+C;7;Medicina;B
+C;3;Engenharia Mecanica;E
+D;6;Resistencia de Materiais;3;3
+D;4;Projeto e Analise de Algoritmos;1;3
+D;9;Gestao de Pessoas;5;4
+D;2;Linguagens Formais e Automatos;1;2
+P;4;Joaquim Almeida
+P;8;Euler
+P;5;Pedro Batista
+P;2;Jose dos Santos
+M;4;2023;7
+M;6;2023;1
+M;7;2023;5
+M;3;2023;2
+M;10;2023;8

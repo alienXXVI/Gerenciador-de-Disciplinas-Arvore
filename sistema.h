@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 
+// ---------------------------- ESTRUTURAS ----------------------------
+
 // Estrutura de cabeçalho do arquivo
 typedef struct {
     int pos_raiz; // posição do início da árvore
@@ -37,7 +39,7 @@ typedef struct {
     int dir;
 } Professor;
 
-// Estrutura para Associação
+// Estrutura para Associação de Disciplina
 typedef struct {
     char cod[10];
     int coddisciplina;
@@ -51,12 +53,12 @@ typedef struct {
 // ---------------------------- ARQUIVO ----------------------------
 
 
-// Verifica se o cabeçalho (a arvore) é vazia
+// Verifica se o cabeçalho (a árvore) é vazia
 // Entrada: cabeçalho
 // Saída: é vazia (1) ou não é vazia (0)
 int vazia(Cabecalho *cab);
 
-// Cria uma arvore nova em arquivo, podendo ser de Curso, Disciplina,
+// Cria uma árvore nova em arquivo, podendo ser de Curso, Disciplina,
 // Professor ou Associação
 // Pré-condição: arquivo aberto para leitura/escrita
 // Pós-condição: arquivo é inicializado com uma árvore vazia
@@ -72,13 +74,21 @@ Cabecalho* ler_cabecalho(FILE *arq);
 // Pós-condição: cabeçalho escrito no arquivo
 void escrever_cabecalho(FILE *arq, Cabecalho *cab);
 
-// Abre arquivo
+// Imprime informações do cabeçalho
+// Entrada: cabeçalho a ser impresso
+// Saída: nenhuma
+void imprimir_cabecalho(Cabecalho *cab);
+
+// Abre arquivo binário para leitura e escrita
 // Pré-condição: string contendo o nome do arquivo.extensão
 // Pós-condição: retorna arquivo aberto
 FILE* open_arq(char *str);
 
 
-// --------------------------- Sistema ---------------------------
+// --------------------------- SISTEMA ---------------------------
+
+
+//                             DISCIPLINA
 
 
 // Cria uma Disciplina contendo os dados fornecidos
@@ -86,142 +96,122 @@ FILE* open_arq(char *str);
 // Pós-condição: retorna ponteiro para Disciplina
 Disciplina* criar_disciplina(int codigo, char *nome, int codcurso, int serie);
 
-// Cria um Curso contendo os dados fornecidos
-// Pré-condição: o código fornecido deve ser diferente de outro curso,
-//      area deve ser 'E' (Exatas), 'H' (Humanas) ou 'B' (Biológicas)
-// Pós-condição: retorna ponteiro para Curso
-Curso* criar_curso(int codigo, char *nome, char area);
-
-// Cria um Professor contendo os dados fornecidos
-// Pré-condição: o código fornecido deve ser diferente de outro professor
-// Pós-condição: retorna ponteiro para CadastroProfessor
-Professor* criar_professor(int codigo, char *nome);
-
-// Cria uma Associação contendo os dados fornecidos
-// Pré-condição: os códigos fornecidos devem ser válidos
-// Pós-condição: retorna ponteiro para CadastroProfessorDisciplina
-Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor);
-
-// ***************************************
-
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
 void inserir_disciplina(FILE* arq, Disciplina* d);
 
+// Busca uma disciplina com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código da disciplina a ser buscada
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_disciplina(FILE* arq, int codigo);
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_disciplinas(FILE* arq);
 
 
+//                             CURSO
+
+
+// Cria um Curso contendo os dados fornecidos
+// Pré-condição: o código fornecido deve ser diferente de outro curso,
+//               área deve ser 'E' (Exatas), 'H' (Humanas) ou 'B' (Biológicas)
+// Pós-condição: retorna ponteiro para Curso
+Curso* criar_curso(int codigo, char *nome, char area);
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
 void inserir_curso(FILE* arq, Curso* d);
 
+// Busca um curso com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código do curso a ser buscado
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_curso(FILE* arq, int codigo);
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_cursos(FILE* arq);
 
+
+//                             PROFESSOR
+
+
+// Cria um Professor contendo os dados fornecidos
+// Pré-condição: o código fornecido deve ser diferente de outro professor
+// Pós-condição: retorna ponteiro para Professor
+Professor* criar_professor(int codigo, char *nome);
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
 void inserir_professor(FILE *arq, Professor* p);
 
+// Busca um professor com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código do professor a ser buscado
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_professor(FILE* arq, int codigo);
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_professores(FILE* arq);
 
+
+//                             ASSOCIAÇÃO
+
+
+// Cria uma Associação contendo os dados fornecidos
+// Pré-condição: os códigos fornecidos devem ser válidos
+// Pós-condição: retorna ponteiro para Associacao
+Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor);
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
 void inserir_associacao(FILE* arq, Associacao* a);
 
-// Busca uma associação com código especificado no arquivo
-// Entrada: arquivo binário da árvore, código da associação a ser buscado
-// Retorno: posição do nó com o código especificado, -1 se não existir
+// Busca uma associação com a chave especificada no arquivo
+// Entrada: arquivo binário da árvore, chave da associação a ser buscada
+// Retorno: posição do nó com a chave especificada, -1 se não existir
 // Pré-condição: o arquivo deve ser válido
 // Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_associacao(FILE* arq, char* codigo);
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_associacoes(FILE* arq);
 
-// ********************************************
-
-
-// Insere o nó na árvore do arquivo
-// Pré-condição: arquivo deve estar aberto para escrita
-// Pós-condição: arquivo com novo nó
-// void inserir_associacao(FILE *arq_associacao, FILE *arq_disciplinas, Associacao* a);
-
-// Busca por uma disciplina através do seu código
-// Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
-// Pós-condição: ponteiro para nó lido é retornado
-//int buscar_disciplina(FILE* arq, int codigo);
-
-// Busca por um curso através do seu código
-// Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
-// Pós-condição: ponteiro para nó lido é retornado
-// Curso* buscar_curso(FILE* arq, int codigo);
-
-// Busca por um professor através do seu código
-// Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
-// Pós-condição: ponteiro para nó lido é retornado
-// Professor* buscar_professor(FILE* arq, int codigo);
-
-// Busca por uma associação através do seu código
-// Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
-// Pós-condição: ponteiro para nó lido é retornado
-// Associacao* buscar_associacao(FILE* arq, int codigo);
-
-// Imprime a árvore de disciplinas
-// Pré-condição: arquivo aberto para leitura
+// Remove uma associação da árvore de associações
+// Entrada: código da disciplina e ano letivo
+// Saída: nenhuma
+// Pré-condição: o código deve ser uma string formata pelo ano letivo e código da disciplina
 // Pós-condição: nenhuma
-void imprimir_disciplinas(FILE *arq);
+void remover_associacao(FILE* f, char* codigo);
 
-// Imprime a árvore de cursos
-// Pré-condição: arquivo aberto para leitura
-// Pós-condição: nenhuma
-void imprimir_cursos(FILE *arq);
-
-// Imprime a árvore de professores
-// Pré-condição: arquivo aberto para leitura
-// Pós-condição: nenhuma
-void imprimir_professores(FILE *arq);
-
-// Imprime a árvore de associações
-// Pré-condição: arquivo aberto para leitura
-// Pós-condição: nenhuma
-void imprimir_associacoes(FILE *arq);
-
-// Imprime a árvore de associações organizada por cursos
-// Pré-condição: arquivos de associações e de cursos abertos para leitura
-// Pós-condição: nenhuma
-void imprimir_associacao2(FILE *arq_associacao, FILE *arq_cursos);
-
-// Imprime a árvore de associações organizada por cursos
-// Pré-condição: arquivos de associações e de cursos abertos para leitura
-// Pós-condição: nenhuma
-void imprimir_associacoes_organizada(FILE *arq_associacao, FILE *arq_cursos);
-
-// Escreve um nó em uma determinada posição do arquivo
-// Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
-// pos deve ser uma posição válida do arquivo
-// Pós-condição: nó escrito no arquivo
-void escrever_associacao(FILE* arq, Associacao *a, int pos);
-
-// Busca por uma associação dada uma posição
-// Pré-condição: arquivo de associação aberto para leitura
-// Pós-condição: nó encontrado é retornado, caso não encontre, retorna NULL
-Associacao* ler_associacao(FILE* arq, int pos);
-
-// Remove uma associação dado seu código e seu ano letivo
-// Pré-condição: arquivo de associação deve estar aberto para escrita
-// Pós-condição: nó removido
-void remover_associacao(FILE *arq, int coddisciplina, int ano_letivo);
-
+// Imprime a lista de nós livres
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: serão impressas todas as posições livres
+void print_livres(FILE* arq);
 
 #endif

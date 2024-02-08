@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "sistema.h"
+#include "lotes.h"
+#include "menu.h"
 
 void imprimir_curso(Curso* c) {
     if(c == NULL) {
@@ -51,47 +53,35 @@ void imprimir_associacao(Associacao* a) {
 
 
 int main() {
-    // FILE *arq_disciplinas = open_arq("arq_disciplinas.txt");
-    // Disciplina *d0 = criar_disciplina(2, "banco de dados2", 11, 3);
-    // Disciplina *d1 = criar_disciplina(1, "banco de dados1", 10, 3);
-    // Disciplina *d2 = criar_disciplina(3, "banco de dados3", 10, 4);
-
-    // inserir_disciplina(arq_disciplinas, d0);
-    // inserir_disciplina(arq_disciplinas, d1);
-    // inserir_disciplina(arq_disciplinas, d2);
-
-    // FILE *arq_cursos = open_arq("arq_cursos.txt");
-    // Curso *d0 = criar_curso(2, "ciencias2", 'E');
-    // Curso *d1 = criar_curso(1, "ciencias1", 'H');
-    // Curso *d2 = criar_curso(3, "ciencias3", 'B');
-
-    // inserir_curso(arq_cursos, d0);
-    // inserir_curso(arq_cursos, d1);
-    // inserir_curso(arq_cursos, d2);
-
-    // print_inordem_cursos(arq_cursos);
-
-    // FILE *arq_professores = open_arq("arq_professores.txt");
-    // Professor *d0 = criar_professor(103, "prof2");
-    // Professor *d1 = criar_professor(101, "prof1");
-    // Professor *d2 = criar_professor(100, "prof3");
-
-    // inserir_professor(arq_professores, d0);
-    // inserir_professor(arq_professores, d1);
-    // inserir_professor(arq_professores, d2);
-
-    // print_inordem_professores(arq_professores);
-
+    FILE *arq_disciplinas = open_arq("arq_disciplinas.bin");
+    FILE *arq_cursos = open_arq("arq_cursos.bin");
+    FILE *arq_professores = open_arq("arq_professores.bin");
     FILE *arq_associacoes = open_arq("arq_associacoes.bin");
-    Associacao *d0 = criar_associacao(10, 2021, 100);
-    Associacao *d1 = criar_associacao(12, 2020, 101);
-    Associacao *d2 = criar_associacao(5, 2023, 102);
 
-    inserir_associacao(arq_associacoes, d0);
-    inserir_associacao(arq_associacoes, d1);
-    inserir_associacao(arq_associacoes, d2);
+    logo();
+    menu_principal(arq_cursos, arq_disciplinas, arq_professores, arq_associacoes);
 
-    print_inordem_associacoes(arq_associacoes);
+    fclose(arq_cursos);
+    fclose(arq_disciplinas);
+    fclose(arq_professores);
+    fclose(arq_associacoes);
+
+    // FILE *arq_associacoes = open_arq("arq_associacoes.bin");
+    // Associacao *a = criar_associacao(10, 2020, 110);
+    // Associacao *a1 = criar_associacao(11, 2021, 111);
+    // Associacao *a2 = criar_associacao(11, 2021, 112);
+    // Associacao *a3 = criar_associacao(13, 2023, 110);
+    // Associacao *a4 = criar_associacao(14, 2023, 114);
+    // Associacao *a5 = criar_associacao(15, 2025, 115);
+
+    // inserir_associacao(arq_associacoes, a);
+    // inserir_associacao(arq_associacoes, a1);
+    // inserir_associacao(arq_associacoes, a2);
+    // inserir_associacao(arq_associacoes, a3);
+    // inserir_associacao(arq_associacoes, a4);
+    // inserir_associacao(arq_associacoes, a5);
+
+    // print_inordem_associacoes(arq_associacoes);
 
     return 0;
 }

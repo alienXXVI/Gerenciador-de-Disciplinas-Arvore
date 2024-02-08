@@ -3,7 +3,7 @@
 #include "sistema.h"
 
 
-// ------------------------------- Arquivo -------------------------------
+// ---------------------------- ARQUIVO ----------------------------
 
 
 // Verifica se o cabeçalho (a árvore) é vazia
@@ -13,10 +13,10 @@ int vazia(Cabecalho *cab) {
     return cab->pos_raiz == -1;
 }
 
-// Cria uma árvore (cabeçalho) nova em arquivo, podendo ser de Curso, Disciplina,
-// CadastroProfessor ou CadastroProfessorDisciplina
+// Cria uma árvore nova em arquivo, podendo ser de Curso, Disciplina,
+// Professor ou Associação
 // Pré-condição: arquivo aberto para leitura/escrita
-// Pós-condição: arquivo é inicializado com uma lista vazia
+// Pós-condição: arquivo é inicializado com uma árvore vazia
 void criar_cabecalho_vazio(FILE* arq){
     Cabecalho *cab = (Cabecalho*) malloc(sizeof(Cabecalho));
 
@@ -46,6 +46,9 @@ void escrever_cabecalho(FILE *arq, Cabecalho *cab){
     fwrite(cab, sizeof(Cabecalho), 1, arq);
 }
 
+// Imprime informações do cabeçalho
+// Entrada: cabeçalho a ser impresso
+// Saída: nenhuma
 void imprimir_cabecalho(Cabecalho *cab) {
     printf("---- CABECALHO ----\n");
     printf("Cabeca: %d\n"
@@ -54,7 +57,7 @@ void imprimir_cabecalho(Cabecalho *cab) {
         cab->pos_raiz, cab->pos_topo, cab->pos_livre);
 }
 
-// Abre arquivo
+// Abre arquivo binário para leitura e escrita
 // Pré-condição: string contendo o nome do arquivo.extensão
 // Pós-condição: retorna arquivo aberto
 FILE* open_arq(char* str){
@@ -73,7 +76,10 @@ FILE* open_arq(char* str){
 }
 
 
-// --------------------------- Sistema ---------------------------
+// --------------------------- SISTEMA ---------------------------
+
+
+//                             DISCIPLINA
 
 
 // Cria uma Disciplina contendo os dados fornecidos
@@ -89,48 +95,11 @@ Disciplina* criar_disciplina(int codigo, char *nome, int codcurso, int serie) {
     return d;
 }
 
-// Cria um Curso contendo os dados fornecidos
-// Pré-condição: o código fornecido deve ser diferente de outro curso,
-//      area deve ser 'E' (Exatas), 'H' (Humanas) ou 'B' (Biológicas)
-// Pós-condição: retorna ponteiro para Curso
-Curso* criar_curso(int codigo, char *nome, char area) {
-    Curso *c = (Curso*) malloc(sizeof(Curso));
-
-    c->cod = codigo;
-    strcpy(c->nome, nome);
-    c->area = area;
-    return c;
-}
-
-// Cria um Professor contendo os dados fornecidos
-// Pré-condição: o código fornecido deve ser diferente de outro professor
-// Pós-condição: retorna ponteiro para Professor
-Professor* criar_professor(int codigo, char *nome) {
-    Professor *p = (Professor*) malloc(sizeof(Professor));
-
-    p->cod = codigo;
-    strcpy(p->nome, nome);
-    return p;
-}
-
-// Cria uma Associacao contendo os dados fornecidos
-// Pré-condição: os códigos fornecidos devem ser válidos
-// Pós-condição: retorna ponteiro para Associacao
-Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor) {
-    Associacao *a = (Associacao*) malloc(sizeof(Associacao));
-    char ano[4], disciplina[10];
-
-    sprintf(a->cod, "%d%d", anoletivo, coddisciplina);
-    a->coddisciplina = coddisciplina;
-    a->anoletivo = anoletivo;
-    a->codprofessor = codprofessor;
-    return a;
-}
-
-
-// --------------------------- Disciplina ---------------------------
-
-
+// Conecta um nó à árvore de acordo com seu código
+// Entrada: arquivo binário da árvore, raiz da árvore, posição do nó no arquivo, código do nó
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: o nó será conectado corretamente na árvore, atualizando as informações dos pais
 void link_no_disciplina(FILE* arq, int raiz, int pos, int codigo){
     Disciplina* aux = (Disciplina*) malloc(sizeof(Disciplina));
 
@@ -173,6 +142,9 @@ void link_no_disciplina(FILE* arq, int raiz, int pos, int codigo){
     if(codigo == aux->cod) free(aux);
 }
 
+// Insere o nó na árvore do arquivo
+// Pré-condição: arquivo deve estar aberto para escrita
+// Pós-condição: arquivo com novo nó
 void inserir_disciplina(FILE* arq, Disciplina* d){
     if(buscar_disciplina(arq, d->cod) == -1){ // se produto já não existir
         Cabecalho* cab = ler_cabecalho(arq);
@@ -208,6 +180,9 @@ void inserir_disciplina(FILE* arq, Disciplina* d){
     }
 }
 
+// Busca o nó dada sua raiz e seu código
+// Entrada: arquivo da árvore, raiz atual e código
+// Saída: posição do nó buscado ou -1 se ele não existir
 int buscar_disciplina_aux(FILE* arq, int raiz, int codigo){
     if(raiz == -1)
         return -1;
@@ -232,6 +207,11 @@ int buscar_disciplina_aux(FILE* arq, int raiz, int codigo){
     }
 }
 
+// Busca uma disciplina com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código da disciplina a ser buscada
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_disciplina(FILE* arq, int codigo){
     Cabecalho* cab = ler_cabecalho(arq);
 
@@ -240,6 +220,9 @@ int buscar_disciplina(FILE* arq, int codigo){
     return pos;
 }
 
+// Imprime informações do nó recursivamente
+// Entrada: arquivo da árvore e raiz atual
+// Saída: nenhuma
 void print_inordem_disciplinas_aux(FILE* arq, int raiz){
     if(raiz == -1)
         return;
@@ -253,15 +236,38 @@ void print_inordem_disciplinas_aux(FILE* arq, int raiz){
     free(aux);
 }
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_disciplinas(FILE* arq){
     Cabecalho* cab = ler_cabecalho(arq);
     print_inordem_disciplinas_aux(arq, cab->pos_raiz);
 }
 
 
-// --------------------------- Curso ---------------------------
+//                             CURSO
 
 
+// Cria um Curso contendo os dados fornecidos
+// Pré-condição: o código fornecido deve ser diferente de outro curso,
+//               área deve ser 'E' (Exatas), 'H' (Humanas) ou 'B' (Biológicas)
+// Pós-condição: retorna ponteiro para Curso
+Curso* criar_curso(int codigo, char *nome, char area) {
+    Curso *c = (Curso*) malloc(sizeof(Curso));
+
+    c->cod = codigo;
+    strcpy(c->nome, nome);
+    c->area = area;
+    return c;
+}
+
+// Conecta um nó à árvore de acordo com seu código
+// Entrada: arquivo binário da árvore, raiz da árvore, posição do nó no arquivo, código do nó
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: o nó será conectado corretamente na árvore, atualizando as informações dos pais
 void link_no_curso(FILE* arq, int raiz, int pos, int codigo){
     Curso* aux = (Curso*) malloc(sizeof(Curso));
 
@@ -304,6 +310,9 @@ void link_no_curso(FILE* arq, int raiz, int pos, int codigo){
     if(codigo == aux->cod) free(aux);
 }
 
+// Insere o nó na árvore do arquivo
+// Pré-condição: arquivo deve estar aberto para escrita
+// Pós-condição: arquivo com novo nó
 void inserir_curso(FILE* arq, Curso* c){
     if(buscar_curso(arq, c->cod) == -1){ // se produto já não existir
         Cabecalho* cab = ler_cabecalho(arq);
@@ -339,6 +348,9 @@ void inserir_curso(FILE* arq, Curso* c){
     }
 }
 
+// Busca o nó dada sua raiz e seu código
+// Entrada: arquivo da árvore, raiz atual e código
+// Saída: posição do nó buscado ou -1 se ele não existir
 int buscar_curso_aux(FILE* arq, int raiz, int codigo){
     if(raiz == -1)
         return -1;
@@ -363,6 +375,11 @@ int buscar_curso_aux(FILE* arq, int raiz, int codigo){
     }
 }
 
+// Busca um curso com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código do curso a ser buscado
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_curso(FILE* arq, int codigo){
     Cabecalho* cab = ler_cabecalho(arq);
 
@@ -371,6 +388,9 @@ int buscar_curso(FILE* arq, int codigo){
     return pos;
 }
 
+// Imprime informações do nó recursivamente
+// Entrada: arquivo da árvore e raiz atual
+// Saída: nenhuma
 void print_inordem_cursos_aux(FILE* arq, int raiz){
     if(raiz == -1)
         return;
@@ -384,15 +404,36 @@ void print_inordem_cursos_aux(FILE* arq, int raiz){
     free(aux);
 }
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_cursos(FILE* arq){
     Cabecalho* cab = ler_cabecalho(arq);
     print_inordem_cursos_aux(arq, cab->pos_raiz);
 }
 
 
-// --------------------------- Professor ---------------------------
+//                             PROFESSOR
 
 
+// Cria um Professor contendo os dados fornecidos
+// Pré-condição: o código fornecido deve ser diferente de outro professor
+// Pós-condição: retorna ponteiro para Professor
+Professor* criar_professor(int codigo, char *nome) {
+    Professor *p = (Professor*) malloc(sizeof(Professor));
+
+    p->cod = codigo;
+    strcpy(p->nome, nome);
+    return p;
+}
+
+// Conecta um nó à árvore de acordo com seu código
+// Entrada: arquivo binário da árvore, raiz da árvore, posição do nó no arquivo, código do nó
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: o nó será conectado corretamente na árvore, atualizando as informações dos pais
 void link_no_professor(FILE* arq, int raiz, int pos, int codigo){
     Professor* aux = (Professor*) malloc(sizeof(Professor));
 
@@ -435,6 +476,9 @@ void link_no_professor(FILE* arq, int raiz, int pos, int codigo){
     if(codigo == aux->cod) free(aux);
 }
 
+// Cria um Professor contendo os dados fornecidos
+// Pré-condição: o código fornecido deve ser diferente de outro professor
+// Pós-condição: retorna ponteiro para Professor
 void inserir_professor(FILE* arq, Professor* p){
     if(buscar_professor(arq, p->cod) == -1){ // se produto já não existir
         Cabecalho* cab = ler_cabecalho(arq);
@@ -470,6 +514,9 @@ void inserir_professor(FILE* arq, Professor* p){
     }
 }
 
+// Busca o nó dada sua raiz e seu código
+// Entrada: arquivo da árvore, raiz atual e código
+// Saída: posição do nó buscado ou -1 se ele não existir
 int buscar_professor_aux(FILE* arq, int raiz, int codigo){
     if(raiz == -1)
         return -1;
@@ -494,6 +541,11 @@ int buscar_professor_aux(FILE* arq, int raiz, int codigo){
     }
 }
 
+// Busca um professor com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código do professor a ser buscado
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_professor(FILE* arq, int codigo){
     Cabecalho* cab = ler_cabecalho(arq);
 
@@ -502,6 +554,9 @@ int buscar_professor(FILE* arq, int codigo){
     return pos;
 }
 
+// Imprime informações do nó recursivamente
+// Entrada: arquivo da árvore e raiz atual
+// Saída: nenhuma
 void print_inordem_professores_aux(FILE* arq, int raiz){
     if(raiz == -1)
         return;
@@ -515,13 +570,32 @@ void print_inordem_professores_aux(FILE* arq, int raiz){
     free(aux);
 }
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_professores(FILE* arq){
     Cabecalho* cab = ler_cabecalho(arq);
     print_inordem_professores_aux(arq, cab->pos_raiz);
 }
 
 
-// --------------------------- Associação ---------------------------
+//                             ASSOCIAÇÃO
+
+
+// Cria uma Associação contendo os dados fornecidos
+// Pré-condição: os códigos fornecidos devem ser válidos
+// Pós-condição: retorna ponteiro para Associacao
+Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor) {
+    Associacao *a = (Associacao*) malloc(sizeof(Associacao));
+
+    sprintf(a->cod, "%d%d", anoletivo, coddisciplina);
+    a->coddisciplina = coddisciplina;
+    a->anoletivo = anoletivo;
+    a->codprofessor = codprofessor;
+    return a;
+}
 
 // Determina qual das duas string é lexicograficamente maior
 // Entrada: as duas string a serem comparadas
@@ -541,6 +615,11 @@ int maior(const char* valor1, const char* valor2) {
     return -1;
 }
 
+// Conecta um nó à árvore de acordo com seu código
+// Entrada: arquivo binário da árvore, raiz da árvore, posição do nó no arquivo, código do nó
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: o nó será conectado corretamente na árvore, atualizando as informações dos pais
 void link_no_associacao(FILE* arq, int raiz, int pos, char* codigo){
     Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
 
@@ -584,6 +663,9 @@ void link_no_associacao(FILE* arq, int raiz, int pos, char* codigo){
         free(aux);
 }
 
+// Insere o nó na árvore do arquivo
+// Pré-condição: arquivo deve estar aberto para escrita
+// Pós-condição: arquivo com novo nó
 void inserir_associacao(FILE* arq, Associacao* p){
     if(buscar_associacao(arq, p->cod) == -1){ // se produto não existir ainda
         Cabecalho* cab = ler_cabecalho(arq);
@@ -619,6 +701,9 @@ void inserir_associacao(FILE* arq, Associacao* p){
     }
 }
 
+// Busca o nó dada sua raiz e seu código
+// Entrada: arquivo da árvore, raiz atual e código
+// Saída: posição do nó buscado ou -1 se ele não existir
 int buscar_associacao_aux(FILE* arq, int raiz, char* codigo){
     if(raiz == -1)
         return -1;
@@ -643,6 +728,11 @@ int buscar_associacao_aux(FILE* arq, int raiz, char* codigo){
     }
 }
 
+// Busca uma associação com a chave especificada no arquivo
+// Entrada: arquivo binário da árvore, chave da associação a ser buscada
+// Retorno: posição do nó com a chave especificada, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_associacao(FILE* arq, char* codigo){
     Cabecalho* cab = ler_cabecalho(arq);
 
@@ -651,6 +741,9 @@ int buscar_associacao(FILE* arq, char* codigo){
     return pos;
 }
 
+// Imprime informações do nó recursivamente
+// Entrada: arquivo da árvore e raiz atual
+// Saída: nenhuma
 void print_inordem_associacoes_aux(FILE* arq, int raiz){
     if(raiz == -1)
         return;
@@ -659,13 +752,187 @@ void print_inordem_associacoes_aux(FILE* arq, int raiz){
     fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
     fread(aux, sizeof(Associacao), 1, arq);
     print_inordem_associacoes_aux(arq, aux->esq);
-    printf("COD: %03d | PROFESSOR: %03d | ANO LETIVO: %d | DISCIPLINA: %03d\n\n", aux->cod, aux->codprofessor, aux->anoletivo, aux->coddisciplina);
+    printf("raiz = %d\n", raiz);
+    printf("COD: %s | PROFESSOR: %03d | ANO LETIVO: %d | DISCIPLINA: %03d\n\n", aux->cod, aux->codprofessor, aux->anoletivo, aux->coddisciplina);
     print_inordem_associacoes_aux(arq, aux->dir);
     free(aux);
 }
 
+// Imprime a árvore in-ordem
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: os nós terão seus códigos e nomes impressos in-ordem
 void print_inordem_associacoes(FILE* arq){
     Cabecalho* cab = ler_cabecalho(arq);
     print_inordem_associacoes_aux(arq, cab->pos_raiz);
 }
 
+// Encontra o maior nó entre os filhos esquerdos da raiz
+// Entrada: arquivo da árvore e raiz atual
+// Saída: posição do nó
+int maximo(FILE* arq, int raiz){
+    if(raiz == -1)
+        return -1;
+
+    Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+    fread(aux, sizeof(Associacao), 1, arq);
+
+    if(aux->dir == -1){
+        free(aux);
+        return raiz;
+    }
+
+    int pos = aux->dir;
+    free(aux);
+    return maximo(arq, pos);
+}
+
+// Desconecta um nó (que não possui filhos à esquerda) de seus pais. Uso exclusivo da função remover que substitui o nó atual
+// pelo nó máximo da esquerda.
+// Entrada: arquivo binário da árvore, raiz da árvore, código do nó a ser desconectado
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido, o nó a ser desconectado não possui filhos à esquerda
+// Pós-condição: os pais do nó receberão seus filhos e ele será desconectado
+void deslink_no(FILE* arq, int raiz, char* codigo){
+    Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+    fread(aux, sizeof(Associacao), 1, arq);
+
+    // Código à esquerda do nó atual
+    if(maior(aux->cod, codigo) == 1){ // codigo < aux->cod
+        if(aux->esq != -1){
+            Associacao* filho = (Associacao*) malloc(sizeof(Associacao));
+            fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * aux->esq, SEEK_SET);
+            fread(filho, sizeof(Associacao), 1, arq);
+
+            // Nó com código informado é filho esquerdo do nó atual
+            if(maior(filho->cod, codigo) == -1){ // filho->cod == codigo
+                aux->esq = filho->dir;
+                fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+                fwrite(aux, sizeof(Associacao), 1, arq);
+                free(filho);
+                free(aux);
+            }
+
+            else{
+                int pos = aux->esq;
+                free(filho);
+                free(aux);
+                deslink_no(arq, pos, codigo);
+            }
+        }
+    }
+
+    // Código à direita do nó atual
+    if(maior(codigo, aux->cod) == 1){ // codigo > aux->cod
+        if(aux->dir != -1){
+            Associacao* filho = (Associacao*) malloc(sizeof(Associacao));
+
+            fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * aux->dir, SEEK_SET);
+            fread(filho, sizeof(Associacao), 1, arq);
+
+            // Nó com código informado é filho direito do nó atual
+            if(maior(filho->cod, codigo) == -1){ // filho->cod == codigo
+                aux->dir = filho->dir;
+                fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+                fwrite(aux, sizeof(Associacao), 1, arq);
+                free(filho);
+                free(aux);
+            }
+
+            else{
+                int pos = aux->dir;
+                free(filho);
+                free(aux);
+                deslink_no(arq, pos, codigo);
+            }
+
+        }
+    }
+    if(maior(codigo, aux->cod) == -1) // codigo == aux->cod
+        free(aux);
+}
+
+// Remove recursivamente um nó
+// Entrada: arquivo da árvore e posição do nó
+// Saída: nenhuma
+void remover_aux(FILE* arq, int pos){
+    Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * pos, SEEK_SET);
+    fread(aux, sizeof(Associacao), 1, arq);
+
+    int maior_esq = maximo(arq, aux->esq);
+
+    // REMOÇÃO EM UM NÓ COM FILHO(S) NA ESQUERDA
+    if(maior_esq != -1){
+        // ETAPA 1: Armazenar informações do filho (nó na POSIÇÃO que será removida)
+        Associacao* filho = (Associacao*) malloc(sizeof(Associacao));
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * maior_esq, SEEK_SET);
+        fread(filho, sizeof(Associacao), 1, arq);
+
+        // ETAPA 2: Remover posição do filho
+        remover_aux(arq, maior_esq);
+
+        // ETAPA 3: Atualizar novos filhos do nó principal (nó com CÓDIGO que será "removido")
+        //          Substituir informação do nó principal pelo nó do filho
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * pos, SEEK_SET);
+        fread(aux, sizeof(Associacao), 1, arq);
+        strcpy(aux->cod, filho->cod); //
+        aux->coddisciplina = filho->coddisciplina;
+        aux->anoletivo = filho->anoletivo;
+        aux->codprofessor = filho->codprofessor;
+
+        // ETAPA 4: Reescrever nó com informação substituída
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * pos, SEEK_SET);
+        fwrite(aux, sizeof(Associacao), 1, arq);
+
+        free(filho);
+    }
+
+    // REMOÇÃO EM UM NÓ SEM FILHOS NA ESQUERDA
+    else{
+        Cabecalho* cab = ler_cabecalho(arq);
+
+        if(pos == cab->pos_raiz)
+            cab->pos_raiz = aux->dir;
+        else
+            deslink_no(arq, cab->pos_raiz, aux->cod);
+
+        aux->esq = -1;
+        aux->dir = cab->pos_livre;
+
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * pos, SEEK_SET);
+        fwrite(aux, sizeof(Associacao), 1, arq);
+
+        cab->pos_livre = pos;
+        escrever_cabecalho(arq, cab);
+        free(cab);
+    }
+
+    free(aux);
+}
+
+// Remove uma associação da árvore de associações
+// Entrada: código da disciplina e ano letivo
+// Saída: nenhuma
+// Pré-condição: o código deve ser uma string formata pelo ano letivo e código da disciplina
+// Pós-condição: nenhuma
+void remover_associacao(FILE* f, char* codigo){
+    int pos = buscar_associacao(f, codigo);
+    if(pos != -1)
+        remover_aux(f, pos);
+}
+
+// Imprime a lista de nós livres
+// Entrada: arquivo binário da árvore
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: serão impressas todas as posições livres
+void print_livres(FILE* arq) {
+
+}
