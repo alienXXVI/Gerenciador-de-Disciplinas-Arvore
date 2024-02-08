@@ -929,10 +929,106 @@ void remover_associacao(FILE* f, char* codigo){
 }
 
 // Imprime a lista de nós livres
+// Entrada: arquivo binário da árvore e raiz atual
+// Retorno: nenhum
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: serão impressas todas as posições livres
+void print_livres_aux(FILE* arq, int raiz){
+    if(raiz != -1){
+        Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+        fread(aux, sizeof(Associacao), 1, arq);
+        int pos = aux->dir;
+        printf("POS LIVRE: %03d\n", raiz);
+        free(aux);
+        print_livres_aux(arq, pos);
+    }
+}
+
+// Imprime a lista de nós livres
 // Entrada: arquivo binário da árvore
 // Retorno: nenhum
 // Pré-condição: o arquivo deve ser válido
 // Pós-condição: serão impressas todas as posições livres
-void print_livres(FILE* arq) {
+void print_livres(FILE* arq){
+    Cabecalho* cab = ler_cabecalho(arq);
+    print_livres_aux(arq, cab->pos_livre);
+    free(cab);
+}
 
+// Insere um novo elemento na lista ordenada
+// Entrada: ponteiro para a lista de associações, posição a ser inserida na lista e informações do nó
+// Retorno: ponteiro para a lista atualizada
+lista* inserir_lista(lista* l, int pos, char* chave, int coddisciplina, int anoletivo, int codprofessor){
+    if(l == NULL || pos <= l->pos){
+        lista* aux = (lista*) malloc(sizeof(lista));
+        strcpy(aux->cod, chave);
+        aux->coddisciplina = coddisciplina;
+        aux->anoletivo = anoletivo;
+        aux->codprofessor = codprofessor;
+        aux->pos = pos;
+        aux->prox = l;
+        return aux;
+    }
+    l->prox = inserir_lista(l->prox, pos, chave, coddisciplina, anoletivo, codprofessor);
+    return l;
+}
+
+// Função auxiliar para percorrer a árvore binária e montar uma lista de associações
+// Entrada: arquivo binário da árvore, ponteiro para a lista de associações
+//          posição da raiz da subárvore a ser percorrida e altura atual na árvore
+// Retorno: nenhum
+void print_arvore_aux(FILE* arq, lista** l, int raiz, int h){
+    if(raiz != -1){
+        Associacao* a = (Associacao*) malloc(sizeof(Associacao));
+        
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+        fread(a, sizeof(Associacao), 1, arq);
+        *l = inserir_lista(*l, h, a->cod, a->coddisciplina, a->anoletivo, a->codprofessor);
+        int esq = a->esq;
+        int dir = a->dir;
+        free(a);
+        print_arvore_aux(arq, l, dir, h+1);
+        print_arvore_aux(arq, l, esq, h+1);
+
+    }
+}
+
+// Imprime a lista
+// Entrada: ponteiro para a lista de associações, posição atual na lista
+// Retorno: nenhum
+void print_lista(lista* l, int pos){
+    if(l == NULL) return;
+    if(l->pos > pos){
+        printf("\n[%s] ", l->cod);
+        print_lista(l->prox, pos+1);
+    }
+    else{
+        printf("[%s] ", l->cod);
+        print_lista(l->prox, pos);
+    }
+} 
+
+// Libera a memória alocada para a lista
+// Entrada: ponteiro para a lista de associações.
+// Retorno: nenhum
+void free_lista(lista* l){
+    if(l == NULL) return;
+    free_lista(l->prox);
+    free(l);
+}
+
+// Imprime a árvore em níveis
+// Entrada: arquivo da árvore
+// Saída: nenhuma
+void print_arvore(FILE* arq){
+    Cabecalho* cab = ler_cabecalho(arq);
+    lista* l = NULL;
+
+    print_arvore_aux(arq, &l, cab->pos_raiz, 0);
+    print_lista(l, 0);
+    printf("\n");
+    free_lista(l);
+    free(cab);
 }

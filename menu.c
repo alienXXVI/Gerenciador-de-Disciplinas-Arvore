@@ -155,12 +155,14 @@ void cadastrar_associacao(FILE *arq_associacoes) {
 void imprimir(FILE *arq_cursos, FILE *arq_disciplinas, FILE *arq_professores, FILE *arq_associacoes) {
     int i = -1;
 
-    while(i != 5) {
+    while(i != 7) {
         printf("\n1 - Imprimir cursos\n"
                "2 - Imprimir disciplinas\n"
                "3 - Imprimir professores\n"
-               "4 - Imprimir associacoes de disciplinas\n"
-               "5 - Voltar\n"
+               "4 - Imprimir associacoes de disciplinas por níveis\n"
+               "5 - Imprimir associacoes de disciplinas in-ordem\n"
+               "6 - Imprimir registros livres\n"
+               "7 - Voltar\n"
                "> ");
         scanf("%d%*c", &i);
 
@@ -171,8 +173,12 @@ void imprimir(FILE *arq_cursos, FILE *arq_disciplinas, FILE *arq_professores, FI
         if(i == 3)
             print_inordem_professores(arq_professores);
         if(i == 4)
-            print_inordem_associacoes(arq_associacoes); //
-        if(i != 1 && i != 2 && i != 3 && i != 4 && i != 5)
+            print_arvore(arq_associacoes);
+        if(i == 5)
+            print_inordem_associacoes(arq_associacoes);
+        if(i == 6)
+            print_livres(arq_associacoes);
+        if(i != 1 && i != 2 && i != 3 && i != 4 && i != 5 && i != 6 && i != 7)
             printf("(Digito invalido)\n");
     }
 }

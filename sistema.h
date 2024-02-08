@@ -49,6 +49,16 @@ typedef struct {
     int dir;
 } Associacao;
 
+// Estrutura de lista para impressão por níveis de Associação
+typedef struct lista{
+    char cod[10];
+    int coddisciplina;
+    int anoletivo;
+    int codprofessor;
+    int pos;
+    struct lista* prox;
+} lista;
+
 
 // ---------------------------- ARQUIVO ----------------------------
 
@@ -213,5 +223,10 @@ void remover_associacao(FILE* f, char* codigo);
 // Pré-condição: o arquivo deve ser válido
 // Pós-condição: serão impressas todas as posições livres
 void print_livres(FILE* arq);
+
+// Imprime a árvore em níveis
+// Entrada: arquivo da árvore
+// Saída: nenhuma
+void print_arvore(FILE* arq);
 
 #endif
