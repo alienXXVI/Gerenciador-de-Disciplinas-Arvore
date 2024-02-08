@@ -82,13 +82,12 @@ int main() {
 
     // print_inordem_professores(arq_professores);
 
-    FILE *arq_associacoes = open_arq("arq_associacoes.txt");
+    FILE *arq_associacoes = open_arq("arq_associacoes.bin");
     Associacao *d0 = criar_associacao(10, 2021, 100);
     Associacao *d1 = criar_associacao(12, 2020, 101);
     Associacao *d2 = criar_associacao(5, 2023, 102);
 
     inserir_associacao(arq_associacoes, d0);
-    printf("ok\n");
     inserir_associacao(arq_associacoes, d1);
     inserir_associacao(arq_associacoes, d2);
 

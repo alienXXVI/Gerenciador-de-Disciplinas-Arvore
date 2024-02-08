@@ -120,7 +120,7 @@ Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor)
     Associacao *a = (Associacao*) malloc(sizeof(Associacao));
     char ano[4], disciplina[10];
 
-    sprintf(a->chave, "%d%d", anoletivo, coddisciplina);
+    sprintf(a->cod, "%d%d", anoletivo, coddisciplina);
     a->coddisciplina = coddisciplina;
     a->anoletivo = anoletivo;
     a->codprofessor = codprofessor;
@@ -548,7 +548,7 @@ void link_no_associacao(FILE* arq, int raiz, int pos, char* codigo){
     fread(aux, sizeof(Associacao), 1, arq);
 
     // Código à esquerda do nó atual
-    if(maior(aux->chave, codigo)){ // codigo < aux->chave
+    if(maior(aux->cod, codigo) == 1){ // codigo < aux->cod
         // O novo nó será filho esquerdo do nó atual
         if(aux->esq == -1){
             aux->esq = pos;
@@ -564,7 +564,7 @@ void link_no_associacao(FILE* arq, int raiz, int pos, char* codigo){
     }
 
     // Código à direita do nó atual
-    if(maior(codigo, aux->chave)){ // codigo > aux->chave
+    if(maior(codigo, aux->cod) == 1){ // codigo > aux->cod
         // O novo nó será filho direito do nó atual
         if(aux->dir == -1){
             aux->dir = pos;
@@ -580,16 +580,16 @@ void link_no_associacao(FILE* arq, int raiz, int pos, char* codigo){
 
     }
 
-    if(maior(codigo, aux->chave) == -1) // codigo == aux->chave
+    if(maior(codigo, aux->cod) == -1) // codigo == aux->cod
         free(aux);
 }
 
-void inserir_associacao(FILE* arq, Associacao* a){
-    if(buscar_associacao(arq, a->chave) == -1){ // se produto já não existir
+void inserir_associacao(FILE* arq, Associacao* p){
+    if(buscar_associacao(arq, p->cod) == -1){ // se produto não existir ainda
         Cabecalho* cab = ler_cabecalho(arq);
 
-        a->dir = -1;
-        a->esq = -1;
+        p->dir = -1;
+        p->esq = -1;
 
         int pos;
         Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
@@ -610,17 +610,16 @@ void inserir_associacao(FILE* arq, Associacao* a){
             cab->pos_raiz = pos;
 
         fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * pos, SEEK_SET);
-        fwrite(a, sizeof(Associacao), 1, arq);
+        fwrite(p, sizeof(Associacao), 1, arq);
         escrever_cabecalho(arq, cab);
-        link_no_associacao(arq, cab->pos_raiz, pos, a->chave);
+        link_no_associacao(arq, cab->pos_raiz, pos, p->cod);
         free(aux);
-        free(a);
+        free(p);
         free(cab);
     }
 }
 
 int buscar_associacao_aux(FILE* arq, int raiz, char* codigo){
-    printf("raiz = %d\n", raiz);
     if(raiz == -1)
         return -1;
 
@@ -628,23 +627,18 @@ int buscar_associacao_aux(FILE* arq, int raiz, char* codigo){
     fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
     fread(aux, sizeof(Associacao), 1, arq);
 
-    printf("ok2\n");
-
-    if(maior(aux->chave, codigo) == -1) { // aux->chave == codigo
+    if(maior(aux->cod, codigo) == -1) { // aux->cod == codigo
         free(aux);
         return raiz;
     }
 
     else {
         int pos;
-        if(maior(aux->chave, codigo)) {// aux->chave > codigo
+        if(maior(aux->cod, codigo) == 1) // aux->cod > codigo
             pos = aux->esq;
-            printf("maior = %d\n", maior(aux->chave, codigo));
-        }
         else
             pos = aux->dir;
         free(aux);
-        printf("ok3\n");
         return buscar_associacao_aux(arq, pos, codigo);
     }
 }
@@ -665,7 +659,7 @@ void print_inordem_associacoes_aux(FILE* arq, int raiz){
     fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
     fread(aux, sizeof(Associacao), 1, arq);
     print_inordem_associacoes_aux(arq, aux->esq);
-    printf("DISCIPLINA: %03d | ANO LETIVO: %d | PROFESSOR: %03d\n\n", aux->coddisciplina, aux->anoletivo, aux->codprofessor);
+    printf("COD: %03d | PROFESSOR: %03d | ANO LETIVO: %d | DISCIPLINA: %03d\n\n", aux->cod, aux->codprofessor, aux->anoletivo, aux->coddisciplina);
     print_inordem_associacoes_aux(arq, aux->dir);
     free(aux);
 }
@@ -674,3 +668,4 @@ void print_inordem_associacoes(FILE* arq){
     Cabecalho* cab = ler_cabecalho(arq);
     print_inordem_associacoes_aux(arq, cab->pos_raiz);
 }
+

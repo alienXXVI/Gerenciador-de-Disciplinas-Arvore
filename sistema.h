@@ -2,7 +2,7 @@
 #define SISTEMA
 #include <stdio.h>
 
-// *
+
 // Estrutura de cabeçalho do arquivo
 typedef struct {
     int pos_raiz; // posição do início da árvore
@@ -39,7 +39,7 @@ typedef struct {
 
 // Estrutura para Associação
 typedef struct {
-    char chave[10];
+    char cod[10];
     int coddisciplina;
     int anoletivo;
     int codprofessor;
@@ -140,6 +140,11 @@ void print_inordem_professores(FILE* arq);
 // Pós-condição: arquivo com novo nó
 void inserir_associacao(FILE* arq, Associacao* a);
 
+// Busca uma associação com código especificado no arquivo
+// Entrada: arquivo binário da árvore, código da associação a ser buscado
+// Retorno: posição do nó com o código especificado, -1 se não existir
+// Pré-condição: o arquivo deve ser válido
+// Pós-condição: será retornada a posição do nó procurado ou -1 se ele não existir
 int buscar_associacao(FILE* arq, char* codigo);
 
 void print_inordem_associacoes(FILE* arq);
