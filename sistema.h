@@ -134,13 +134,23 @@ int buscar_professor(FILE* arq, int codigo);
 
 void print_inordem_professores(FILE* arq);
 
+
+// Insere o nó na árvore do arquivo
+// Pré-condição: arquivo deve estar aberto para escrita
+// Pós-condição: arquivo com novo nó
+void inserir_associacao(FILE* arq, Associacao* a);
+
+int buscar_associacao(FILE* arq, char* codigo);
+
+void print_inordem_associacoes(FILE* arq);
+
 // ********************************************
 
 
 // Insere o nó na árvore do arquivo
 // Pré-condição: arquivo deve estar aberto para escrita
 // Pós-condição: arquivo com novo nó
-void inserir_associacao(FILE *arq_associacao, FILE *arq_disciplinas, Associacao* a);
+// void inserir_associacao(FILE *arq_associacao, FILE *arq_disciplinas, Associacao* a);
 
 // Busca por uma disciplina através do seu código
 // Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
@@ -160,7 +170,7 @@ void inserir_associacao(FILE *arq_associacao, FILE *arq_disciplinas, Associacao*
 // Busca por uma associação através do seu código
 // Pré-condição: arquivo deve estar aberto e ser um arquivo de árvore
 // Pós-condição: ponteiro para nó lido é retornado
-Associacao* buscar_associacao(FILE* arq, int codigo);
+// Associacao* buscar_associacao(FILE* arq, int codigo);
 
 // Imprime a árvore de disciplinas
 // Pré-condição: arquivo aberto para leitura

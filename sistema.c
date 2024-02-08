@@ -118,7 +118,9 @@ Professor* criar_professor(int codigo, char *nome) {
 // Pós-condição: retorna ponteiro para Associacao
 Associacao* criar_associacao(int coddisciplina, int anoletivo, int codprofessor) {
     Associacao *a = (Associacao*) malloc(sizeof(Associacao));
+    char ano[4], disciplina[10];
 
+    sprintf(a->chave, "%d%d", anoletivo, coddisciplina);
     a->coddisciplina = coddisciplina;
     a->anoletivo = anoletivo;
     a->codprofessor = codprofessor;
@@ -521,4 +523,154 @@ void print_inordem_professores(FILE* arq){
 
 // --------------------------- Associação ---------------------------
 
+// Determina qual das duas string é lexicograficamente maior
+// Entrada: as duas string a serem comparadas
+// Saída: 1 se o primeiro valor é maior, 0 se o segundo é maior e -1 se são iguais
+int maior(const char* valor1, const char* valor2) {
+    int i = 0;
 
+    while(valor1[i] != '\0' || valor2[i] != '\0') {
+        if(valor1[i] > valor2[i])
+            return 1;
+        
+        if(valor1[i] < valor2[i])
+            return 0;
+        i++;
+    }
+    // são iguais
+    return -1;
+}
+
+void link_no_associacao(FILE* arq, int raiz, int pos, char* codigo){
+    Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+    fread(aux, sizeof(Associacao), 1, arq);
+
+    // Código à esquerda do nó atual
+    if(maior(aux->chave, codigo)){ // codigo < aux->chave
+        // O novo nó será filho esquerdo do nó atual
+        if(aux->esq == -1){
+            aux->esq = pos;
+            fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+            fwrite(aux, sizeof(Associacao), 1, arq);
+            free(aux);
+        }
+        else{ // já tem filhos à esquerda
+            int pos_aux = aux->esq;
+            free(aux);
+            link_no_associacao(arq, pos_aux, pos, codigo);
+        }
+    }
+
+    // Código à direita do nó atual
+    if(maior(codigo, aux->chave)){ // codigo > aux->chave
+        // O novo nó será filho direito do nó atual
+        if(aux->dir == -1){
+            aux->dir = pos;
+            fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+            fwrite(aux, sizeof(Associacao), 1, arq);
+            free(aux);
+        }
+        else{
+            int pos_aux = aux->dir;
+            free(aux);
+            link_no_associacao(arq, pos_aux, pos, codigo);
+        }
+
+    }
+
+    if(maior(codigo, aux->chave) == -1) // codigo == aux->chave
+        free(aux);
+}
+
+void inserir_associacao(FILE* arq, Associacao* a){
+    if(buscar_associacao(arq, a->chave) == -1){ // se produto já não existir
+        Cabecalho* cab = ler_cabecalho(arq);
+
+        a->dir = -1;
+        a->esq = -1;
+
+        int pos;
+        Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+        // Há nós livres no arquivo
+        if(cab->pos_livre != -1){
+            fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * cab->pos_livre, SEEK_SET);
+            fread(aux, sizeof(Associacao), 1, arq);
+            pos = cab->pos_livre; // guarda a posição no produto a ser inserido
+            cab->pos_livre = aux->dir; // atualiza o pos livre para o proximo
+        }
+
+        else
+            pos = (cab->pos_topo)++; // cria um novo topo
+
+        // Novo nó será a raiz da árvore
+        if(cab->pos_raiz == -1)
+            cab->pos_raiz = pos;
+
+        fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * pos, SEEK_SET);
+        fwrite(a, sizeof(Associacao), 1, arq);
+        escrever_cabecalho(arq, cab);
+        link_no_associacao(arq, cab->pos_raiz, pos, a->chave);
+        free(aux);
+        free(a);
+        free(cab);
+    }
+}
+
+int buscar_associacao_aux(FILE* arq, int raiz, char* codigo){
+    printf("raiz = %d\n", raiz);
+    if(raiz == -1)
+        return -1;
+
+    Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+    fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+    fread(aux, sizeof(Associacao), 1, arq);
+
+    printf("ok2\n");
+
+    if(maior(aux->chave, codigo) == -1) { // aux->chave == codigo
+        free(aux);
+        return raiz;
+    }
+
+    else {
+        int pos;
+        if(maior(aux->chave, codigo)) {// aux->chave > codigo
+            pos = aux->esq;
+            printf("maior = %d\n", maior(aux->chave, codigo));
+        }
+        else
+            pos = aux->dir;
+        free(aux);
+        printf("ok3\n");
+        return buscar_associacao_aux(arq, pos, codigo);
+    }
+}
+
+int buscar_associacao(FILE* arq, char* codigo){
+    Cabecalho* cab = ler_cabecalho(arq);
+
+    int pos = buscar_associacao_aux(arq, cab->pos_raiz, codigo);
+    free(cab);
+    return pos;
+}
+
+void print_inordem_associacoes_aux(FILE* arq, int raiz){
+    if(raiz == -1)
+        return;
+    Associacao* aux = (Associacao*) malloc(sizeof(Associacao));
+
+    fseek(arq, sizeof(Cabecalho) + sizeof(Associacao) * raiz, SEEK_SET);
+    fread(aux, sizeof(Associacao), 1, arq);
+    print_inordem_associacoes_aux(arq, aux->esq);
+    printf("DISCIPLINA: %03d | ANO LETIVO: %d | PROFESSOR: %03d\n\n", aux->coddisciplina, aux->anoletivo, aux->codprofessor);
+    print_inordem_associacoes_aux(arq, aux->dir);
+    free(aux);
+}
+
+void print_inordem_associacoes(FILE* arq){
+    Cabecalho* cab = ler_cabecalho(arq);
+    print_inordem_associacoes_aux(arq, cab->pos_raiz);
+}

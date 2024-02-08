@@ -71,16 +71,28 @@ int main() {
 
     // print_inordem_cursos(arq_cursos);
 
-    FILE *arq_professores = open_arq("arq_professores.txt");
-    Professor *d0 = criar_professor(103, "prof2");
-    Professor *d1 = criar_professor(101, "prof1");
-    Professor *d2 = criar_professor(100, "prof3");
+    // FILE *arq_professores = open_arq("arq_professores.txt");
+    // Professor *d0 = criar_professor(103, "prof2");
+    // Professor *d1 = criar_professor(101, "prof1");
+    // Professor *d2 = criar_professor(100, "prof3");
 
-    inserir_professor(arq_professores, d0);
-    inserir_professor(arq_professores, d1);
-    inserir_professor(arq_professores, d2);
+    // inserir_professor(arq_professores, d0);
+    // inserir_professor(arq_professores, d1);
+    // inserir_professor(arq_professores, d2);
 
-    print_inordem_professores(arq_professores);
+    // print_inordem_professores(arq_professores);
+
+    FILE *arq_associacoes = open_arq("arq_associacoes.txt");
+    Associacao *d0 = criar_associacao(10, 2021, 100);
+    Associacao *d1 = criar_associacao(12, 2020, 101);
+    Associacao *d2 = criar_associacao(5, 2023, 102);
+
+    inserir_associacao(arq_associacoes, d0);
+    printf("ok\n");
+    inserir_associacao(arq_associacoes, d1);
+    inserir_associacao(arq_associacoes, d2);
+
+    print_inordem_associacoes(arq_associacoes);
 
     return 0;
 }

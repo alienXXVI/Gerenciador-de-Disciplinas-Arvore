@@ -6,7 +6,7 @@ proximo passo: fazer o resto das funções de inserir para as outras estruturas
 – cadastrar disciplina OK
 – cadastrar professor OK
 – cadastrar distribuicao de disciplina
-– remover distribuicao de disciplina: remove a distribui¸c˜ao de uma disciplina dado seu o c´odigo e
+– remover distribuicao de disciplina: remove a distribuicao de uma disciplina dado seu o codigo e
 ano letivo
 – imprimir lista de cursos, ordenados por codigo OK
 – imprimir lista de disciplinas, ordenadas por codigo OK
